@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <style>
         body {
-            background-color: #0a0a0a;
+            background-color: #000000;
             color: #ffffff;
             font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
             margin: 0;
@@ -14,16 +14,16 @@
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background-color: #111111;
-            border: 1px solid #222222;
+            background-color: #050505;
+            border: 1px solid #9D4EDD;
             border-radius: 8px;
             overflow: hidden;
         }
         .header {
             padding: 30px;
             text-align: center;
-            border-bottom: 1px solid #222222;
-            background: linear-gradient(180deg, #1a1a1a 0%, #111111 100%);
+            border-bottom: 1px solid #9D4EDD;
+            background: linear-gradient(180deg, #11081f 0%, #000000 100%);
         }
         .header h1 {
             margin: 0;
@@ -33,7 +33,7 @@
             color: #ffffff;
         }
         .header p {
-            color: #39FF14;
+            color: #9D4EDD;
             font-size: 13px;
             font-weight: bold;
             letter-spacing: 2px;
@@ -50,8 +50,8 @@
             text-align: center;
         }
         .panel {
-            background-color: #0a0a0a;
-            border: 1px solid #222222;
+            background-color: #000000;
+            border: 1px solid #9D4EDD;
             border-radius: 6px;
             padding: 20px;
             margin-bottom: 30px;
@@ -65,7 +65,7 @@
             margin: 0 0 5px 0;
         }
         .panel-value {
-            color: #ffffff;
+            color: #9D4EDD;
             font-size: 20px;
             font-family: monospace;
             font-weight: bold;
@@ -80,7 +80,7 @@
         .table th {
             text-align: left;
             padding: 10px 0;
-            border-bottom: 1px solid #333333;
+            border-bottom: 1px solid #9D4EDD;
             color: #888888;
             font-size: 11px;
             text-transform: uppercase;
@@ -88,7 +88,7 @@
         }
         .table td {
             padding: 15px 0;
-            border-bottom: 1px solid #222222;
+            border-bottom: 1px solid rgba(157, 78, 221, 0.3);
             font-size: 14px;
         }
         .item-name {
@@ -107,7 +107,7 @@
         .totals {
             display: table;
             width: 100%;
-            border-top: 1px solid #333333;
+            border-top: 1px solid #9D4EDD;
             padding-top: 20px;
             margin-bottom: 40px;
         }
@@ -126,7 +126,7 @@
         .totals-value {
             display: table-cell;
             text-align: right;
-            color: #39FF14;
+            color: #9D4EDD;
             font-size: 20px;
             font-family: monospace;
             font-weight: bold;
@@ -137,8 +137,8 @@
             width: 100%;
             text-align: center;
             background-color: transparent;
-            color: #39FF14;
-            border: 1px solid #39FF14;
+            color: #9D4EDD;
+            border: 1px solid #9D4EDD;
             padding: 18px 0;
             text-decoration: none;
             border-radius: 4px;
@@ -149,13 +149,13 @@
             transition: all 0.3s ease;
         }
         .btn:hover {
-            background-color: rgba(57, 255, 20, 0.1);
+            background-color: rgba(157, 78, 221, 0.1);
         }
         .footer {
             padding: 20px;
             text-align: center;
-            background-color: #0a0a0a;
-            border-top: 1px solid #222222;
+            background-color: #000000;
+            border-top: 1px solid #9D4EDD;
         }
         .footer p {
             color: #666666;
@@ -214,7 +214,7 @@
                 {% if order.coupon %}
                 <div class="totals-row">
                     <div class="totals-label">Discount ({{ order.coupon.code }})</div>
-                    <div class="totals-value" style="color: #39FF14;">-${{ order.discount_amount|floatformat:2 }}</div>
+                    <div class="totals-value" style="color: #9D4EDD;">-${{ order.discount_amount|floatformat:2 }}</div>
                 </div>
                 {% endif %}
                 <div class="totals-row">
