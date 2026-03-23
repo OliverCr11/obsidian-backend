@@ -36,7 +36,17 @@ class CreateOrderView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        order = serializer.save(user=self.request.user)
+        coupon_code = self.request.data.get('coupon_code')
+        coupon = None
+        if coupon_code:
+            try:
+                c = Coupon.objects.get(code=coupon_code.upper())
+                if c.is_valid():
+                    coupon = c
+            except Coupon.DoesNotExist:
+                pass
+                
+        order = serializer.save(user=self.request.user, coupon=coupon)
         
         # Native Django SMTP wrapper triggering through Resend Configurations
         try:

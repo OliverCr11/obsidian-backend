@@ -45,6 +45,18 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def subtotal(self):
+        return sum(item.price * item.quantity for item in self.items.all())
+
+    @property
+    def discount_amount(self):
+        if self.coupon:
+            if self.coupon.discount_type == 'PERCENTAGE':
+                return self.subtotal * (self.coupon.value / 100)
+            return min(self.coupon.value, self.subtotal)
+        return 0
+
     def __str__(self):
         return f"Order {self.order_id} - {self.full_name}"
 

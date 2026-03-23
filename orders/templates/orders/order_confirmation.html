@@ -208,8 +208,18 @@
             
             <div class="totals">
                 <div class="totals-row">
-                    <div class="totals-label">Total Authorized</div>
-                    <div class="totals-value">${{ order.total_paid }}</div>
+                    <div class="totals-label">Subtotal</div>
+                    <div class="totals-value" style="color: #ffffff;">${{ order.subtotal|floatformat:2 }}</div>
+                </div>
+                {% if order.coupon %}
+                <div class="totals-row">
+                    <div class="totals-label">Discount ({{ order.coupon.code }})</div>
+                    <div class="totals-value" style="color: #39FF14;">-${{ order.discount_amount|floatformat:2 }}</div>
+                </div>
+                {% endif %}
+                <div class="totals-row">
+                    <div class="totals-label" style="padding-top: 15px;">Total Authorized</div>
+                    <div class="totals-value" style="padding-top: 15px;">${{ order.total_paid|floatformat:2 }}</div>
                 </div>
             </div>
             
