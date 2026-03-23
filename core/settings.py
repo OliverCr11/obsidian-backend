@@ -166,6 +166,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
+# core/settings.py
 
 # SMTP / Resend Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -173,5 +174,8 @@ EMAIL_HOST = 'smtp.resend.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'resend'
-EMAIL_HOST_PASSWORD = 're_YOUR_RESEND_API_KEY_PLACEHOLDER'
-DEFAULT_FROM_EMAIL = 'Obsidian Core <onboarding@resend.dev>'
+EMAIL_HOST_PASSWORD = 're_ancYr48X_Jy1AJ66QX9KxSF8k3vYFRngK'
+DEFAULT_FROM_EMAIL = 'onboarding@resend.dev'
+
+# Python SDK Wrapper Alias
+RESEND_API_KEY = EMAIL_HOST_PASSWORD
