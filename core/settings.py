@@ -40,11 +40,13 @@ INSTALLED_APPS = [
     
     # Third-party Apps
     'rest_framework',
+    'rest_framework_simplejwt',
     'corsheaders',
 
     # Local Apps
     'products',
     'orders',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -141,6 +143,9 @@ CORS_ALLOWED_ORIGINS = [
 # Django REST Framework Configuration
 # https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
@@ -150,4 +155,14 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
     ],
+}
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
