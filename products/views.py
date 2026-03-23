@@ -8,3 +8,11 @@ class GloveList(generics.ListAPIView):
     """
     queryset = Glove.objects.all().order_by('-created_at')
     serializer_class = GloveSerializer
+
+class GloveDetail(generics.RetrieveAPIView):
+    """
+    API endpoint that retrieves a single product by its unique slug.
+    """
+    queryset = Glove.objects.all()
+    serializer_class = GloveSerializer
+    lookup_field = 'slug'
