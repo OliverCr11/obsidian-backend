@@ -1,7 +1,31 @@
 import uuid
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import User
 from products.models import Glove
+
+class Coupon(models.Model):
+    DISCOUNT_CHOICES = (
+        ('PERCENTAGE', 'Percentage'),
+        ('FIXED', 'Fixed Amount'),
+    )
+    code = models.CharField(max_length=50, unique=True)
+    discount_type = models.CharField(max_length=20, choices=DISCOUNT_CHOICES, default='PERCENTAGE')
+    value = models.DecimalField(max_digits=10, decimal_places=2, help_text="Percentage (e.g., 20) or Fixed Amount (e.g., 15.00)")
+    active = models.BooleanField(default=True)
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+
+    def is_valid(self):
+        now = timezone.now()
+        return self.active and self.valid_from <= now <= self.valid_to
+
+    def save(self, *args, **kwargs):
+        self.code = self.code.upper()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.code
 
 class Order(models.Model):
     STATUS_CHOICES = (
@@ -12,6 +36,7 @@ class Order(models.Model):
     
     order_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     full_name = models.CharField(max_length=255)
     email = models.EmailField()
     address = models.CharField(max_length=255)

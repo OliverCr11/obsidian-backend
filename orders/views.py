@@ -1,10 +1,34 @@
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
-from .models import Order
+from .models import Order, Coupon
 from .serializers import OrderSerializer
+
+class ApplyCouponView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        code = request.data.get('code', '').upper()
+        if not code:
+            return Response({'error': 'Coupon code is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            coupon = Coupon.objects.get(code=code)
+            if not coupon.is_valid():
+                return Response({'error': 'This coupon is expired or inactive.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response({
+                'code': coupon.code,
+                'discount_type': coupon.discount_type,
+                'value': str(coupon.value)
+            }, status=status.HTTP_200_OK)
+            
+        except Coupon.DoesNotExist:
+            return Response({'error': 'Invalid coupon code.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class CreateOrderView(generics.CreateAPIView):
     queryset = Order.objects.all()
