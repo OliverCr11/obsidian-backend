@@ -9,13 +9,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'password', 'email', 'first_name')
         extra_kwargs = {
             'password': {'write_only': True},
-            'email': {'required': True}
+            'email': {'required': True},
+            'username': {'required': False}
         }
 
     def create(self, validated_data):
-        # We enforce email to serve dually as the unique username
+        # We enforce email to serve dually as the unique username seamlessly across the base model
+        username_fallback = validated_data.get('username', validated_data['email'])
+        
         user = User.objects.create_user(
-            username=validated_data['email'],
+            username=username_fallback,
             email=validated_data['email'],
             password=validated_data['password'],
             first_name=validated_data.get('first_name', '')
