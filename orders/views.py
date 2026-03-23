@@ -6,6 +6,11 @@ from .serializers import OrderSerializer
 class CreateOrderView(generics.CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    # Explicitly enforce user integrity mapping cleanly to authentication header properties
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class OrderListView(generics.ListAPIView):
     """
