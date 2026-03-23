@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.conf import settings
 from .models import Order
 from .serializers import OrderSerializer
@@ -10,7 +11,6 @@ class CreateOrderView(generics.CreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
-    # Explicitly enforce user integrity mapping cleanly to authentication header properties
     def perform_create(self, serializer):
         order = serializer.save(user=self.request.user)
         
@@ -18,7 +18,9 @@ class CreateOrderView(generics.CreateAPIView):
         try:
             subject = 'Order Confirmed - Obsidian'
             message = f"Hi {self.request.user.email}, your order #{order.order_id} for ${order.total_paid} is confirmed."
-            html_message = f"Hi <strong>{self.request.user.email}</strong>, your order #{str(order.order_id).split('-')[0].upper()} for <strong>${order.total_paid}</strong> is confirmed. Welcome to Obsidian Core."
+            
+            # Dynamic Injection extracting structural 'Dark Luxury' elements natively
+            html_message = render_to_string('orders/order_confirmation.html', {'order': order})
             
             send_mail(
                 subject,

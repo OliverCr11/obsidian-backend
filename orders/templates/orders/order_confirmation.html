@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #111111;
+            border: 1px solid #222222;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid #222222;
+            background: linear-gradient(180deg, #1a1a1a 0%, #111111 100%);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #ffffff;
+        }
+        .header p {
+            color: #39FF14;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .intro {
+            color: #cccccc;
+            font-size: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .panel {
+            background-color: #0a0a0a;
+            border: 1px solid #222222;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .panel-label {
+            color: #888888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0 0 5px 0;
+        }
+        .panel-value {
+            color: #ffffff;
+            font-size: 20px;
+            font-family: monospace;
+            font-weight: bold;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .table th {
+            text-align: left;
+            padding: 10px 0;
+            border-bottom: 1px solid #333333;
+            color: #888888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .table td {
+            padding: 15px 0;
+            border-bottom: 1px solid #222222;
+            font-size: 14px;
+        }
+        .item-name {
+            color: #ffffff;
+            font-weight: 500;
+        }
+        .item-qty {
+            color: #888888;
+            text-align: center;
+        }
+        .item-price {
+            color: #aaaaaa;
+            text-align: right;
+            font-family: monospace;
+        }
+        .totals {
+            display: table;
+            width: 100%;
+            border-top: 1px solid #333333;
+            padding-top: 20px;
+            margin-bottom: 40px;
+        }
+        .totals-row {
+            display: table-row;
+        }
+        .totals-label {
+            display: table-cell;
+            text-align: right;
+            padding-right: 20px;
+            color: #888888;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .totals-value {
+            display: table-cell;
+            text-align: right;
+            color: #39FF14;
+            font-size: 20px;
+            font-family: monospace;
+            font-weight: bold;
+            width: 120px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background-color: transparent;
+            color: #39FF14;
+            border: 1px solid #39FF14;
+            padding: 18px 0;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background-color: rgba(57, 255, 20, 0.1);
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            background-color: #0a0a0a;
+            border-top: 1px solid #222222;
+        }
+        .footer p {
+            color: #666666;
+            font-size: 11px;
+            margin: 0;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>OBSIDIAN CORE</h1>
+            <p>Transmission Confirmed</p>
+        </div>
+        
+        <div class="content">
+            <p class="intro">
+                Incoming transmission, <strong style="color: #ffffff;">{{ order.user.email }}</strong>.<br>Your strategic assets have been secured and are entering the fulfillment sequence.
+            </p>
+            
+            <div class="panel">
+                <p class="panel-label">Operation ID</p>
+                <p class="panel-value">{{ order.order_id|stringformat:"s"|slice:":8"|upper }}</p>
+            </div>
+            
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Asset Payload</th>
+                        <th style="text-align: center;">Qty</th>
+                        <th style="text-align: right;">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td class="item-name">{{ item.glove.name }}</td>
+                        <td class="item-qty">{{ item.quantity }}</td>
+                        <td class="item-price">${{ item.price }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: #666;">Standard provision payload.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div class="totals">
+                <div class="totals-row">
+                    <div class="totals-label">Total Authorized</div>
+                    <div class="totals-value">${{ order.total_paid }}</div>
+                </div>
+            </div>
+            
+            <a href="http://localhost:5173/dashboard" class="btn">Track Order Dashboard</a>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2026 Obsidian Tactical Division</p>
+        </div>
+    </div>
+</body>
+</html>
