@@ -16,7 +16,19 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+class ProductImage(models.Model):
+    glove = models.ForeignKey('Glove', related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='products/gallery/')
+    is_primary = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        if self.is_primary:
+            ProductImage.objects.filter(glove=self.glove).update(is_primary=False)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Image for {self.glove.name} (Primary: {self.is_primary})"
 class Glove(models.Model):
     COLLECTION_CHOICES = [
         ('DROP', 'Limited Edition'),
