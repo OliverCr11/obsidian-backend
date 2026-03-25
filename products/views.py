@@ -6,8 +6,14 @@ class GloveList(generics.ListAPIView):
     """
     API endpoint that allows products to be viewed.
     """
-    queryset = Glove.objects.all().order_by('-created_at')
     serializer_class = GloveSerializer
+
+    def get_queryset(self):
+        queryset = Glove.objects.all().order_by('-created_at')
+        collection = self.request.query_params.get('collection_type', None)
+        if collection:
+            queryset = queryset.filter(collection_type=collection.upper())
+        return queryset
 
 class GloveDetail(generics.RetrieveAPIView):
     """
