@@ -67,7 +67,7 @@ class CreateOrderView(generics.CreateAPIView):
         except Exception as e:
             print(f"Email dispatch failed silently: {e}")
 
-class OrderListView(generics.ListAPIView):
+class UserOrdersView(generics.ListAPIView):
     """
     Returns a secure temporal list of authenticated Orders filtered exclusively to the requesting JWT User identity.
     """
