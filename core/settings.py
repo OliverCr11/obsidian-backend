@@ -204,3 +204,11 @@ DEFAULT_FROM_EMAIL = 'onboarding@resend.dev'
 
 # Python SDK Wrapper Alias
 RESEND_API_KEY = EMAIL_HOST_PASSWORD
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+# Cloudinary for Product Images
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
