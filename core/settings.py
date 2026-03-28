@@ -39,15 +39,15 @@ CSRF_COOKIE_SECURE = True
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
-    'django.contrib.staticfiles',
     'cloudinary',
-    
+    'django.contrib.staticfiles',
+    'whitenoise.runserver_nostatic',
     # Third-party Apps
     'rest_framework',
     'rest_framework_simplejwt',
