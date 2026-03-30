@@ -39,7 +39,7 @@ CSRF_COOKIE_SECURE = True
 # Application definition
 
 INSTALLED_APPS = [
-    'cloudinary_storage',
+    # 'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'cloudinary',
+    'whitenoise.runserver_nostatic',
 
     # Third-party Apps
     'rest_framework',
@@ -134,23 +135,41 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# ==============================================================================
+# STATIC FILES (CSS, JavaScript, Images)
+# ==============================================================================
+# URL to use when referring to static files
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-# Media files & Cloudinary Production Storage
+# Local directory where collectstatic will gather files for production
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Force WhiteNoise to handle CSS/JS (Admin Styles)
+# This prevents Cloudinary from breaking the Admin layout
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# ==============================================================================
+# MEDIA FILES & CLOUDINARY STORAGE (Product Images)
+# ==============================================================================
+# Base URL to serve media files
 MEDIA_URL = '/media/'
+
+# Local directory to store media files during development
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Use Cloudinary ONLY for Media (Product Images)
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
+# Cloudinary Credentials (ensure these variables are set in production)
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# CORS Configuration
+# ==============================================================================
+# CORS CONFIGURATION
+# ==============================================================================
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
@@ -158,7 +177,9 @@ CORS_ALLOWED_ORIGINS = [
     "https://your-vercel-frontend-url.vercel.app",  # TODO: Replace with your actual Vercel URL
 ]
 
-# Django REST Framework Configuration
+# ==============================================================================
+# DJANGO REST FRAMEWORK CONFIGURATION
+# ==============================================================================
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -174,7 +195,11 @@ REST_FRAMEWORK = {
     ],
 }
 
+# ==============================================================================
+# SIMPLE JWT CONFIGURATION
+# ==============================================================================
 from datetime import timedelta
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
@@ -184,13 +209,16 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
 
-# SMTP / Resend Email Configuration
+# ==============================================================================
+# EMAIL/SMTP CONFIGURATION (Resend)
+# ==============================================================================
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.resend.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'resend'
-EMAIL_HOST_PASSWORD = 're_ancYr48X_Jy1AJ66QX9KxSF8k3vYFRngK'
+# Using os.environ.get for sensitive API keys. Ensure RESEND_API_KEY is configured in your environment!
+EMAIL_HOST_PASSWORD = os.environ.get('RESEND_API_KEY', 're_ancYr48X_Jy1AJ66QX9KxSF8k3vYFRngK')
 DEFAULT_FROM_EMAIL = 'onboarding@resend.dev'
 
 # Python SDK Wrapper Alias
