@@ -39,7 +39,7 @@ CSRF_COOKIE_SECURE = True
 # Application definition
 
 INSTALLED_APPS = [
-    # 'cloudinary_storage',
+    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -174,7 +174,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5173",
-    "https://your-vercel-frontend-url.vercel.app",  # TODO: Replace with your actual Vercel URL
+    "https://obsidian-frontend-alpha.vercel.app",
 ]
 
 # ==============================================================================
