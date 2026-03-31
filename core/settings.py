@@ -144,21 +144,13 @@ STATIC_URL = '/static/'
 # Local directory where collectstatic will gather files for production
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Force WhiteNoise to handle CSS/JS (Admin Styles)
-# This prevents Cloudinary from breaking the Admin layout
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 # ==============================================================================
 # MEDIA FILES & CLOUDINARY STORAGE (Product Images)
 # ==============================================================================
 # Base URL to serve media files
 MEDIA_URL = '/media/'
 
-# Local directory to store media files during development
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Use Cloudinary ONLY for Media (Product Images)
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# We DO NOT define MEDIA_ROOT here to prevent any local filesystem storage fallback!
 
 # Cloudinary Credentials (ensure these variables are set in production)
 CLOUDINARY_STORAGE = {
@@ -166,6 +158,23 @@ CLOUDINARY_STORAGE = {
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
+
+# ==============================================================================
+# STORAGE BACKENDS (Django 4.2+ Support)
+# Django 5+ ignores DEFAULT_FILE_STORAGE. We must use the STORAGES dictionary.
+# ==============================================================================
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+# Legacy Fallbacks (just in case)
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ==============================================================================
 # CORS CONFIGURATION
