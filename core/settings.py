@@ -8,15 +8,19 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
-"""
-
+""" 
 from pathlib import Path
 import os
 import dj_database_url
+from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env file
+load_dotenv(os.path.join(BASE_DIR.parent, '.env')) # If .env is in Obsidian folder
+load_dotenv(os.path.join(BASE_DIR, '.env'))        # Fallback if .env is in obsidian-backend folder
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -27,7 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!amd*_vk-n6o3fp$tnz^k$7sa^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', '127.0.0.1', 'localhost']
 CSRF_TRUSTED_ORIGINS = [
     'https://web-production-2af0fe.up.railway.app',
     'https://*.up.railway.app',
@@ -95,13 +99,24 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600
-    )
-}
+db_url = os.environ.get('DATABASE_URL', '').strip()
 
+if not db_url:
+    # Fallback to local SQLite if DATABASE_URL is missing or empty
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    # Use Railway PostgreSQL Database in Production
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=db_url,
+            conn_max_age=600
+        )
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
