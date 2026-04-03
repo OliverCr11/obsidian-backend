@@ -12,8 +12,9 @@ class ProductImageInline(admin.TabularInline):
 
 @admin.register(Glove)
 class GloveAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'collection_type', 'price', 'stock', 'created_at')
-    list_filter = ('category', 'collection_type', 'size')
+    list_display = ('name', 'category', 'collection_type', 'price', 'stock', 'is_hero_drop', 'created_at')
+    list_editable = ('is_hero_drop',)
+    list_filter = ('category', 'collection_type', 'size', 'is_hero_drop')
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductImageInline]
