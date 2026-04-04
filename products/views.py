@@ -50,8 +50,7 @@ class GloveList(generics.ListAPIView):
 
 class GloveDetail(generics.RetrieveAPIView):
     """
-    API endpoint that retrieves a single product by its unique slug.
+    API endpoint that retrieves a single product by its unique ID.
     """
     queryset = Glove.objects.all()
     serializer_class = GloveSerializer
-    lookup_field = 'slug'
