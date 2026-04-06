@@ -194,12 +194,18 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # ==============================================================================
 # CORS CONFIGURATION
 # ==============================================================================
+CORS_ALLOW_ALL_ORIGINS = True # TEMPORARY FOR DEV ONLY
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5173",
     "https://obsidian-frontend-alpha.vercel.app",
     "https://obsidian-frontend-wq4pj3jc6-olivercr11s-projects.vercel.app",
+]
+
+CORS_ALLOWED_ORIGIN_REGEX_WHITELIST = [
+    r"^https://obsidian-frontend-.*\.vercel\.app$",
 ]
 
 # ==============================================================================
