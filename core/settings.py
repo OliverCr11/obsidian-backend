@@ -255,3 +255,5 @@ DEFAULT_FROM_EMAIL = 'onboarding@resend.dev'
 
 # Python SDK Wrapper Alias
 RESEND_API_KEY = EMAIL_HOST_PASSWORD
+
+# Database persistence test.
