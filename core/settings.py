@@ -45,14 +45,16 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
     'cloudinary_storage',
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'cloudinary',
-    'whitenoise.runserver_nostatic',
+  
 
     # Third-party Apps
     'rest_framework',
@@ -139,15 +141,15 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
+LANGUAGES = [
+    ('es', 'Spanish'),
+    ('en', 'English'),
+]
+
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 

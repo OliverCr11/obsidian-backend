@@ -23,17 +23,10 @@ class MainDropView(APIView):
         elif backup_image and backup_image.image:
             image_url = backup_image.image.url
 
-        return Response({
-            "id": featured_glove.id,
-            "name": featured_glove.name,
-            "description": featured_glove.description,
-            "price": str(featured_glove.price),
-            "hero_title_over_the_product": featured_glove.hero_title_over_the_product,
-            "hero_marketing_description": featured_glove.hero_marketing_description,
-            "limited_drop_info_text": featured_glove.limited_drop_info_text,
-            "countdown_target_date": featured_glove.countdown_target_date.isoformat() if featured_glove.countdown_target_date else None,
-            "image_url": image_url
-        })
+        serializer_data = GloveSerializer(featured_glove).data
+        serializer_data["image_url"] = image_url
+
+        return Response(serializer_data)
 
 class GloveList(generics.ListAPIView):
     """
