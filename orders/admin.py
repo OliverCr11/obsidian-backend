@@ -14,7 +14,7 @@ class CouponAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['order_id', 'full_name', 'email', 'total_paid', 'status', 'created_at']
+    list_display = ['order_id', 'user', 'full_name', 'email', 'total_paid', 'status', 'created_at']
     list_filter = ['status', 'created_at']
     search_fields = ['order_id', 'full_name', 'email']
     readonly_fields = ['order_id', 'created_at']

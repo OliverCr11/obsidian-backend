@@ -33,7 +33,7 @@ class ApplyCouponView(APIView):
 class CreateOrderView(generics.CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
         coupon_code = self.request.data.get('coupon_code')
@@ -46,12 +46,16 @@ class CreateOrderView(generics.CreateAPIView):
             except Coupon.DoesNotExist:
                 pass
                 
-        order = serializer.save(user=self.request.user, coupon=coupon)
+        user = self.request.user if self.request.user.is_authenticated else None
+        order = serializer.save(user=user, coupon=coupon)
         
+        # Determine the recipient email (use authenticated user email or fallback to order email provided by guest)
+        recipient_email = user.email if user else order.email
+
         # Native Django SMTP wrapper triggering through Resend Configurations
         try:
             subject = 'Order Confirmed - Obsidian'
-            message = f"Hi {self.request.user.email}, your order #{order.order_id} for ${order.total_paid} is confirmed."
+            message = f"Hi {recipient_email}, your order #{order.order_id} for ${order.total_paid} is confirmed."
             
             # Dynamic Injection extracting structural 'Dark Luxury' elements natively
             html_message = render_to_string('orders/order_confirmation.html', {'order': order})
@@ -60,7 +64,7 @@ class CreateOrderView(generics.CreateAPIView):
                 subject,
                 message,
                 settings.DEFAULT_FROM_EMAIL,
-                [self.request.user.email],
+                [recipient_email],
                 fail_silently=False,
                 html_message=html_message
             )
