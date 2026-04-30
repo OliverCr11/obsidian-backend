@@ -213,15 +213,16 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # CORS & CSRF CONFIGURATION
 # ==============================================================================
 # Parse dynamic comma-separated string from Railway environment
-raw_origins = get_env_variable(
-    'CORS_ALLOWED_ORIGINS', 
-    default='http://localhost:5173,http://127.0.0.1:5173'
-)
+raw_origins = get_env_variable('CORS_ALLOWED_ORIGINS', default='')
 parsed_origins = [origin.strip() for origin in raw_origins.split(',') if origin.strip()]
 
+# Always guarantee local Vercel/Vite endpoints work safely
+local_fallbacks = ['http://localhost:5173', 'http://127.0.0.1:5173']
+final_origins = list(set(parsed_origins + local_fallbacks))
+
 CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = parsed_origins
-CSRF_TRUSTED_ORIGINS = parsed_origins
+CORS_ALLOWED_ORIGINS = final_origins
+CSRF_TRUSTED_ORIGINS = final_origins
 
 # Vercel wildcard regex fallback just in case the strict origin block fails
 CORS_ALLOWED_ORIGIN_REGEX_WHITELIST = [
