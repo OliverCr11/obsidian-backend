@@ -48,11 +48,7 @@ SECRET_KEY = get_env_variable('SECRET_KEY', required=True)
 DEBUG = get_env_variable('DEBUG', default='False') == 'True'
 
 ALLOWED_HOSTS = ['*', '127.0.0.1', 'localhost']
-CSRF_TRUSTED_ORIGINS = [
-    'https://web-production-2af0fe.up.railway.app',
-    'https://*.up.railway.app',
-    'https://*.vercel.app'
-]
+# CSRF_TRUSTED_ORIGINS is configured dynamically in the CORS section below
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -214,20 +210,22 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ==============================================================================
-# CORS CONFIGURATION
+# CORS & CSRF CONFIGURATION
 # ==============================================================================
-CORS_ALLOW_ALL_ORIGINS = True # TEMPORARY FOR DEV ONLY
+# Parse dynamic comma-separated string from Railway environment
+raw_origins = get_env_variable(
+    'CORS_ALLOWED_ORIGINS', 
+    default='http://localhost:5173,http://127.0.0.1:5173'
+)
+parsed_origins = [origin.strip() for origin in raw_origins.split(',') if origin.strip()]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://127.0.0.1:5173",
-    "https://obsidian-frontend-alpha.vercel.app",
-    "https://obsidian-frontend-wq4pj3jc6-olivercr11s-projects.vercel.app",
-]
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = parsed_origins
+CSRF_TRUSTED_ORIGINS = parsed_origins
 
+# Vercel wildcard regex fallback just in case the strict origin block fails
 CORS_ALLOWED_ORIGIN_REGEX_WHITELIST = [
-    r"^https://obsidian-frontend-.*\.vercel\.app$",
+    r"^https://.*\.vercel\.app$",
 ]
 
 # ==============================================================================
