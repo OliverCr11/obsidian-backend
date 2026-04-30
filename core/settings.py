@@ -80,9 +80,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -221,12 +221,13 @@ local_fallbacks = ['http://localhost:5173', 'http://127.0.0.1:5173']
 final_origins = list(set(parsed_origins + local_fallbacks))
 
 CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = final_origins
 CSRF_TRUSTED_ORIGINS = final_origins
 
-# Vercel wildcard regex fallback just in case the strict origin block fails
-CORS_ALLOWED_ORIGIN_REGEX_WHITELIST = [
-    r"^https://.*\.vercel\.app$",
+# Vercel dynamic preview regex resolver
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://obsidian-.*\.vercel\.app$",
 ]
 
 # ==============================================================================
