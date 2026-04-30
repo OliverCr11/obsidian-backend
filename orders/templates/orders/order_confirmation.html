@@ -181,6 +181,10 @@
             <div class="panel">
                 <p class="panel-label">Operation ID</p>
                 <p class="panel-value">{{ order.order_id|stringformat:"s"|slice:":8"|upper }}</p>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dotted #333;">
+                    <p class="panel-label">Global Tracking Network</p>
+                    <p style="color: #ffffff; font-family: monospace; font-size: 16px; margin: 0; letter-spacing: 1px;">{{ tracking_id }}</p>
+                </div>
             </div>
             
             <table class="table">

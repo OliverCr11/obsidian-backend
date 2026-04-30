@@ -7,6 +7,58 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from .models import Order, Coupon
 from .serializers import OrderSerializer
+from products.models import Glove
+import stripe
+import uuid
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+class CreatePaymentIntentView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        try:
+            items = request.data.get('items', [])
+            coupon_code = request.data.get('coupon_code')
+            
+            subtotal = 0
+            for item in items:
+                try:
+                    product = Glove.objects.get(id=item.get('glove'))
+                    subtotal += float(product.price) * int(item.get('quantity', 1))
+                except Glove.DoesNotExist:
+                    pass
+            
+            discount_amount = 0
+            if coupon_code:
+                try:
+                    coupon = Coupon.objects.get(code=coupon_code.upper(), active=True)
+                    if coupon.is_valid():
+                        if coupon.discount_type == 'fixed':
+                            discount_amount = float(coupon.value)
+                        else:  # percentage
+                            discount_amount = subtotal * (float(coupon.value) / 100)
+                except Coupon.DoesNotExist:
+                    pass
+            
+            final_total = max(subtotal - discount_amount, 0)
+            if items:
+                final_total += 15.00  # SHIPPING RATE
+
+            # Create Stripe PaymentIntent
+            intent = stripe.PaymentIntent.create(
+                amount=int(final_total * 100),
+                currency='usd',
+                metadata={'integration_check': 'accept_a_payment'},
+            )
+
+            return Response({
+                'client_secret': intent.client_secret,
+                'calculated_total': final_total
+            })
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ApplyCouponView(APIView):
     permission_classes = [AllowAny]
@@ -47,29 +99,33 @@ class CreateOrderView(generics.CreateAPIView):
                 pass
                 
         user = self.request.user if self.request.user.is_authenticated else None
-        order = serializer.save(user=user, coupon=coupon)
         
-        # Determine the recipient email (use authenticated user email or fallback to order email provided by guest)
+        # Override the status logic, forcing PAID given the Stripe completion dependency
+        order = serializer.save(user=user, coupon=coupon, status='PAID')
+        
         recipient_email = user.email if user else order.email
 
-        # Native Django SMTP wrapper triggering through Resend Configurations
         try:
             subject = 'Order Confirmed - Obsidian'
-            message = f"Hi {recipient_email}, your order #{order.order_id} for ${order.total_paid} is confirmed."
+            tracking_id = f"TRK-OBS-{str(order.order_id).split('-')[0].upper()}"
+            message = f"Hi {recipient_email}, your order #{order.order_id} for ${order.total_paid} is confirmed. Tracking: {tracking_id}"
             
-            # Dynamic Injection extracting structural 'Dark Luxury' elements natively
-            html_message = render_to_string('orders/order_confirmation.html', {'order': order})
+            html_message = render_to_string('orders/order_confirmation.html', {
+                'order': order,
+                'tracking_id': tracking_id
+            })
             
             send_mail(
                 subject,
                 message,
                 settings.DEFAULT_FROM_EMAIL,
-                [recipient_email],
+                [recipient_email, 'stalincriollo11@gmail.com'], # Admin CC forced to bypass Resend Sandbox restrictions temporarily
                 fail_silently=False,
                 html_message=html_message
             )
         except Exception as e:
-            print(f"Email dispatch failed silently: {e}")
+            # Resend Sandbox only allows sending to the registered developer email until a domain is verified.
+            print(f"RESEND SMTP ERROR - Email dispatch failed (Likely Sandbox Domain Restriction): {e}")
 
 class UserOrdersView(generics.ListAPIView):
     """

@@ -4,7 +4,10 @@ from rest_framework.response import Response
 from .models import Glove
 from .serializers import GloveSerializer
 
+from rest_framework.permissions import AllowAny
+
 class MainDropView(APIView):
+    permission_classes = [AllowAny]
     """
     API endpoint that returns the SINGLE active featured drop for the Hero section.
     """
@@ -33,6 +36,7 @@ class GloveList(generics.ListAPIView):
     API endpoint that allows products to be viewed.
     """
     serializer_class = GloveSerializer
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         queryset = Glove.objects.all().order_by('-created_at')
@@ -47,3 +51,4 @@ class GloveDetail(generics.RetrieveAPIView):
     """
     queryset = Glove.objects.all()
     serializer_class = GloveSerializer
+    permission_classes = [AllowAny]

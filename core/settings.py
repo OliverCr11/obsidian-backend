@@ -13,6 +13,22 @@ from pathlib import Path
 import os
 import dj_database_url
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
+
+# ==============================================================================
+# ENVIRONMENT UTILITY
+# ==============================================================================
+def get_env_variable(var_name, default=None, required=False):
+    """
+    Retrieve environment variables globally.
+    If required=True and the variable is missing, it fails the startup securely.
+    """
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        if required:
+            raise ImproperlyConfigured(f"CRITICAL SECURITY ERROR: Set the {var_name} environment variable.")
+        return default
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,10 +42,10 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))        # Fallback if .env is in obsi
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!amd*_vk-n6o3fp$tnz^k$7sa^rzie1@b)a(w=3=9djmgw8^1b')
+SECRET_KEY = get_env_variable('SECRET_KEY', required=True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = get_env_variable('DEBUG', default='False') == 'True'
 
 ALLOWED_HOSTS = ['*', '127.0.0.1', 'localhost']
 CSRF_TRUSTED_ORIGINS = [
@@ -172,9 +188,9 @@ MEDIA_URL = '/media/'
 
 # Cloudinary Credentials (ensure these variables are set in production)
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    'CLOUD_NAME': get_env_variable('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': get_env_variable('CLOUDINARY_API_KEY'),
+    'API_SECRET': get_env_variable('CLOUDINARY_API_SECRET'),
 }
 
 # ==============================================================================
@@ -254,11 +270,17 @@ EMAIL_HOST = 'smtp.resend.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'resend'
-# Using os.environ.get for sensitive API keys. Ensure RESEND_API_KEY is configured in your environment!
-EMAIL_HOST_PASSWORD = os.environ.get('RESEND_API_KEY', 're_ancYr48X_Jy1AJ66QX9KxSF8k3vYFRngK')
+# Using dynamic env abstraction for sensitive API keys.
+EMAIL_HOST_PASSWORD = get_env_variable('RESEND_API_KEY', required=True)
 DEFAULT_FROM_EMAIL = 'onboarding@resend.dev'
 
 # Python SDK Wrapper Alias
 RESEND_API_KEY = EMAIL_HOST_PASSWORD
+
+# ==============================================================================
+# STRIPE CONFIGURATION
+# ==============================================================================
+STRIPE_PUBLIC_KEY = get_env_variable('STRIPE_PUBLIC_KEY', required=True)
+STRIPE_SECRET_KEY = get_env_variable('STRIPE_SECRET_KEY', required=True)
 
 # Database persistence test.
