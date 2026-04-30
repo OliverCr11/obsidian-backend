@@ -273,6 +273,7 @@ EMAIL_HOST_USER = 'resend'
 # Using dynamic env abstraction for sensitive API keys.
 EMAIL_HOST_PASSWORD = get_env_variable('RESEND_API_KEY', required=True)
 DEFAULT_FROM_EMAIL = 'onboarding@resend.dev'
+EMAIL_TIMEOUT = 5 # Force socket drop after 5 seconds to prevent memory leaks
 
 # Python SDK Wrapper Alias
 RESEND_API_KEY = EMAIL_HOST_PASSWORD

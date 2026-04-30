@@ -10,6 +10,7 @@ from .serializers import OrderSerializer
 from products.models import Glove
 import stripe
 import uuid
+import threading
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -105,27 +106,31 @@ class CreateOrderView(generics.CreateAPIView):
         
         recipient_email = user.email if user else order.email
 
-        try:
-            subject = 'Order Confirmed - Obsidian'
-            tracking_id = f"TRK-OBS-{str(order.order_id).split('-')[0].upper()}"
-            message = f"Hi {recipient_email}, your order #{order.order_id} for ${order.total_paid} is confirmed. Tracking: {tracking_id}"
-            
-            html_message = render_to_string('orders/order_confirmation.html', {
-                'order': order,
-                'tracking_id': tracking_id
-            })
-            
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                [recipient_email, 'stalincriollo11@gmail.com'], # Admin CC forced to bypass Resend Sandbox restrictions temporarily
-                fail_silently=False,
-                html_message=html_message
-            )
-        except Exception as e:
-            # Resend Sandbox only allows sending to the registered developer email until a domain is verified.
-            print(f"RESEND SMTP ERROR - Email dispatch failed (Likely Sandbox Domain Restriction): {e}")
+        def send_confirmation_email():
+            try:
+                subject = 'Order Confirmed - Obsidian'
+                tracking_id = f"TRK-OBS-{str(order.order_id).split('-')[0].upper()}"
+                message = f"Hi {recipient_email}, your order #{order.order_id} for ${order.total_paid} is confirmed. Tracking: {tracking_id}"
+                
+                html_message = render_to_string('orders/order_confirmation.html', {
+                    'order': order,
+                    'tracking_id': tracking_id
+                })
+                
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [recipient_email, 'stalincriollo11@gmail.com'], # Admin CC forced to bypass Resend Sandbox restrictions temporarily
+                    fail_silently=False,
+                    html_message=html_message
+                )
+            except Exception as e:
+                print(f"RESEND SMTP ERROR - Email dispatch failed (Likely Sandbox Domain Restriction or Timeout): {e}")
+
+        # Dispatch email in a background thread to prevent Gunicorn 30s timeout crashes
+        email_thread = threading.Thread(target=send_confirmation_email)
+        email_thread.start()
 
 class UserOrdersView(generics.ListAPIView):
     """
